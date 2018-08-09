@@ -28,36 +28,35 @@ namespace PackSizeCode
                             if (!String.IsNullOrEmpty(temp[i - 1].Type) && temp[i - 1].Type == "Cut")
                             {
 
-                                Console.WriteLine("Move long-head 1 to " + (temp[i + 1].StartingCoordinate.X));
-                                Console.WriteLine("Lower long-head 1 " + temp[i + 1].Type);
-                                Console.WriteLine("Move long-head 2 to " + temp[i + 1].StartingCoordinate.X);
-                                Console.WriteLine("Lower long-head 2 " + temp[i + 1].Type);
+                                dtCommands.Rows.Add("Move long-head 1 to " + (temp[i + 1].StartingCoordinate.X));
+                                dtCommands.Rows.Add("Lower long-head 1 " + temp[i + 1].Type);
+                                dtCommands.Rows.Add("Move long-head 2 to " + temp[i + 1].StartingCoordinate.X);
+                                dtCommands.Rows.Add("Lower long-head 2 " + temp[i + 1].Type);
                             }
                             else
                             {
-                                Console.WriteLine("Lower cross-head knife");
-                                Console.WriteLine("Move cross-head to " + (temp[i].StartingCoordinate.X));
-                                Console.WriteLine("Raise cross-head knife");
+                                dtCommands.Rows.Add("Lower cross-head knife");
+                                dtCommands.Rows.Add("Move cross-head to " + (temp[i].StartingCoordinate.X));
+                                dtCommands.Rows.Add("Raise cross-head knife");
                             }
                         }
                         if (temp[i].Type == "Crease")
                         {
-                            Console.WriteLine("Move long-head 3 to " + temp[i].StartingCoordinate.X);
-                            Console.WriteLine("Lower long-head 3 knife");
-                            Console.WriteLine(" ");
+                            dtCommands.Rows.Add("Move long-head 3 to " + temp[i].StartingCoordinate.X);
+                            dtCommands.Rows.Add("Lower long-head 3 knife");
+                            dtCommands.Rows.Add("");
                         }
                     }
                     else
                     {
-                        Console.WriteLine("Move cross-head to " + temp[i].StartingCoordinate.X);
-                        Console.WriteLine("Lower cross-head knife");
-                        Console.WriteLine("Move cross-head to " + (temp[i + 1].StartingCoordinate.X));
-                        Console.WriteLine("Raise cross-head knife");
+                        dtCommands.Rows.Add("Move cross-head to " + temp[i].StartingCoordinate.X);
+                        dtCommands.Rows.Add("Lower cross-head knife");
+                        dtCommands.Rows.Add("Move cross-head to " + (temp[i + 1].StartingCoordinate.X));
+                        dtCommands.Rows.Add("Raise cross-head knife");
                     }
                 }
             }
-            Console.ReadLine();
-            var JSON = DataTableToJSON(dtCommands);
+            var finalCommandListJSON = DataTableToJSON(dtCommands);
         }
 
         private static List<DataClasses.RootObject> parseJSON(string v)
@@ -70,13 +69,20 @@ namespace PackSizeCode
             var jsonString = new StringBuilder();
             if (dt.Rows.Count > 0)
             {
-                jsonString.Append("[");
+                jsonString.Append("[" + "\r\n");
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
                     for (int j = 0; j < dt.Columns.Count; j++)
-                        jsonString.Append("\"" + dt.Rows[i][j].ToString() + "\"" + "\r\n");
+                        if (String.IsNullOrEmpty(dt.Rows[i][j].ToString()))
+                        {
+                            jsonString.Append("\n");
+                        }
+                        else
+                        {
+                            jsonString.Append("\"" + dt.Rows[i][j].ToString() + "\"" + "\r\n");
+                        }
                 }
-                return jsonString.Append("]").ToString();
+                return jsonString.Append("\r\n" + "]").ToString();
             }
             else
             {
